@@ -1,4 +1,5 @@
 import os
+import random
 
 symbols = ['X', 'O']
 
@@ -80,6 +81,107 @@ def handle_players():
             case _:
                 print("Invalid command.")
 
+def start_new_game(player1, player2):
+    turn = random.choice([1 , 2])
+
+    def initial_game():
+        player_symbol = [None, None]
+        if turn == 1:
+            while True:
+                choice = input('Player 1 choose his symbol: ')
+                if choice in ['X', 'O']:
+                    player_symbol[0] = choice
+                    break
+                else:
+                    print('Please choose a valid symbol. (X or O)')
+            player_symbol[1] = 'O' if player_symbol[0] == 'X' else 'X'
+
+        else:
+            while True:
+                choice = input('Player 2 choose his symbol: ')
+                if choice in ['X', 'O']:
+                    player_symbol[1] = choice
+                    break
+                else:
+                    print('Please choose a valid symbol. (X or O)')
+            player_symbol[0] = 'O' if player_symbol[1] == 'X' else 'X'
+
+        return player_symbol
+
+    player_symbol = initial_game()
+    game_board = [['-', '-', '-'] for i in range(3)]
+    os.system('clear')
+
+    while True:
+        if turn == 1:
+            print('Turn for player 1')
+        else:
+            print('Turn for player 2')
+
+        for i in range(3):
+            for j in range(3):
+                print(game_board[i][j], end=' ')
+            print()
+
+        try:
+            row, col = list(map(int, input('Please enter the position you want to play: ').split()))
+        except Exception:
+            os.system('clear')
+            print('Error! Please enter the position you want to play in a true format. (for example your input could be 1 3)')
+        else:
+            os.system('clear')
+            if 0 < row < 4 and 0 < col < 4:
+                if (game_board[row - 1][col - 1] == '-'):
+                    game_board[row - 1][col - 1] = player_symbol[turn - 1]
+                    turn = 1 if turn == 2 else 2
+
+                    def check_for_win():
+
+                        for i in range(3):
+                            for j in range(2):
+                                if game_board[i][j] != game_board[i][j + 1] or game_board[i][j] == '-':
+                                    break
+                            else:
+                                return True
+
+                        for j in range(3):
+                            for i in range(2):
+                                if game_board[i][j] != game_board[i + 1][j] or game_board[i][j] == '-':
+                                    break
+                            else:
+                                return True
+
+                        if (game_board[0][0] == game_board[1][1]
+                                and game_board[1][1] == game_board[2][2]
+                                and game_board[0][0] != '-'):
+                            return True
+
+                        if (game_board[2][0] == game_board[1][1]
+                                and game_board[1][1] == game_board[0][2]
+                                and game_board[1][1] != '-'):
+                            return True
+
+                        return False
+
+                    if check_for_win():
+                        print(f'Player {turn} wins the game!')
+                        break
+
+                    def check_for_draw():
+                        for i in range(3):
+                            for j in range(3):
+                                if game_board[i][j] == '-':
+                                    return False
+                        return True
+
+                    if check_for_draw():
+                        print('Draw!')
+                        break
+                else:
+                    print('Error! You can not play at this positon')
+            else:
+                print('Error! You must choose your number in [1,3]')
+
 def main_menu():
     while True:
         print('You are at main menu')
@@ -88,8 +190,18 @@ def main_menu():
         match command:
             case 'manage players' | '1':
                 handle_players()
+
             case 'start new game' | '2':
-                pass
+                player1 = input("Please enter first player's name: ")
+                if find_player(player1) is None:
+                    print('Player with this name does not exist')
+                else:
+                    player2 = input("Please enter second player's name: ")
+                    if find_player(player2) is None:
+                        print('Player with this name does not exist')
+                    else:
+                        start_new_game(player1, player2)
+
             case 'show history' | '3':
                 pass
             case 'help':
