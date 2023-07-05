@@ -19,6 +19,124 @@ class Player(object):
         self.name = name
 
 
+class Board(object):
+    global history
+
+    def __init__(self, player1_name, player2_name):
+        self.players = [player1_name, player2_name]
+        self.game_board = [['-', '-', '-'] for _ in range(3)]
+        self.turn = random.choice([1, 2])
+        self.symbols = self.initial_game()
+
+    def initial_game(self):
+        players_symbols = [None, None]
+        if self.turn == 1:
+            while True:
+                choice = input(f'Player {self.players[0]} choose his symbol: ')
+                if choice in ['X', 'O']:
+                    players_symbols[0] = choice
+                    break
+                else:
+                    print('Please choose a valid symbol. (X or O)')
+            players_symbols[1] = 'O' if players_symbols[0] == 'X' else 'X'
+
+        else:
+            while True:
+                choice = input(f'Player {self.players[1]} choose his symbol: ')
+                if choice in ['X', 'O']:
+                    players_symbols[1] = choice
+                    break
+                else:
+                    print('Please choose a valid symbol. (X or O)')
+            players_symbols[0] = 'O' if players_symbols[1] == 'X' else 'X'
+
+        os.system('clear')
+        return players_symbols
+
+    def print_board(self):
+        for i in range(3):
+            for j in range(3):
+                print(self.game_board[i][j], end=' ')
+            print()
+
+    def print_turn(self):
+        if self.turn == 1:
+            print(f'Turn for {self.players[0]}')
+        else:
+            print(f'Turn for {self.players[1]}')
+
+    def start_game(self):
+        while True:
+
+            self.print_turn()
+            self.print_board()
+
+            # noinspection PyBroadException
+            try:
+                row, col = list(map(int, input('Please enter the position you want to play: ').split()))
+            except Exception:
+                os.system('clear')
+                print('Error! Please enter the position you want to play in a true format. '
+                      '(for example your input could be 1 3)')
+            else:
+                os.system('clear')
+                if 0 < row < 4 and 0 < col < 4:
+                    if self.game_board[row - 1][col - 1] == '-':
+                        self.game_board[row - 1][col - 1] = self.symbols[self.turn - 1]
+
+                        if self.check_for_win():
+                            print(f'Player {self.players[self.turn - 1]} wins the game!')
+                            history.append({'player1': self.players[0], 'player2': self.players[1],
+                                            'result': 'win', 'winner': self.players[self.turn - 1]})
+                            return
+                        if self.check_for_draw():
+                            print('Draw!')
+                            history.append({'player1': self.players[0], 'player2': self.players[1],
+                                            'result': 'draw', 'winner': None})
+                            return
+
+                        self.turn = 1 if self.turn == 2 else 2
+                    else:
+                        print('Error! You can not play at this position')
+                else:
+                    print('Error! You must choose your number in [1,3]')
+
+    def check_for_win(self):
+
+        for i_ in range(3):
+            for j_ in range(2):
+                if self.game_board[i_][j_] != self.game_board[i_][j_ + 1] or self.game_board[i_][j_] == '-':
+                    break
+            else:
+                return True
+
+        for j_ in range(3):
+            for i_ in range(2):
+                if self.game_board[i_][j_] != self.game_board[i_ + 1][j_] or self.game_board[i_][j_] == '-':
+                    break
+            else:
+                return True
+
+        if (self.game_board[0][0] == self.game_board[1][1]
+                and self.game_board[1][1] == self.game_board[2][2]
+                and self.game_board[0][0] != '-'):
+            return True
+
+        if (self.game_board[2][0] == self.game_board[1][1]
+                and self.game_board[1][1] == self.game_board[0][2]
+                and self.game_board[1][1] != '-'):
+            return True
+
+        return False
+
+    def check_for_draw(self):
+        for i_ in range(3):
+            for j_ in range(3):
+                if self.game_board[i_][j_] == '-':
+                    return False
+        return True
+
+
 def find_player(name):
     for player in Player.all_players:
         if player.name == name:
@@ -90,112 +208,8 @@ def handle_players():
 
 
 def start_new_game(player1, player2):
-    global history
-    players = [player1, player2]
-    turn = random.choice([1, 2])
-
-    def initial_game():
-        players_symbols = [None, None]
-        if turn == 1:
-            while True:
-                choice = input(f'Player {players[0]} choose his symbol: ')
-                if choice in ['X', 'O']:
-                    players_symbols[0] = choice
-                    break
-                else:
-                    print('Please choose a valid symbol. (X or O)')
-            players_symbols[1] = 'O' if players_symbols[0] == 'X' else 'X'
-
-        else:
-            while True:
-                choice = input(f'Player {players[1]} choose his symbol: ')
-                if choice in ['X', 'O']:
-                    players_symbols[1] = choice
-                    break
-                else:
-                    print('Please choose a valid symbol. (X or O)')
-            players_symbols[0] = 'O' if players_symbols[1] == 'X' else 'X'
-
-        return players_symbols
-
-    player_symbol = initial_game()
-    game_board = [['-', '-', '-'] for _ in range(3)]
-    os.system('clear')
-
-    while True:
-        if turn == 1:
-            print(f'Turn for {players[0]}')
-        else:
-            print(f'Turn for {players[1]}')
-
-        for i in range(3):
-            for j in range(3):
-                print(game_board[i][j], end=' ')
-            print()
-
-        try:
-            row, col = list(map(int, input('Please enter the position you want to play: ').split()))
-        except Exception:
-            os.system('clear')
-            print('Error! Please enter the position you want to play in a true format. '
-                  '(for example your input could be 1 3)')
-        else:
-            os.system('clear')
-            if 0 < row < 4 and 0 < col < 4:
-                if game_board[row - 1][col - 1] == '-':
-                    game_board[row - 1][col - 1] = player_symbol[turn - 1]
-
-                    def check_for_win():
-
-                        for i_ in range(3):
-                            for j_ in range(2):
-                                if game_board[i_][j_] != game_board[i_][j_ + 1] or game_board[i_][j_] == '-':
-                                    break
-                            else:
-                                return True
-
-                        for j_ in range(3):
-                            for i_ in range(2):
-                                if game_board[i_][j_] != game_board[i_ + 1][j_] or game_board[i_][j_] == '-':
-                                    break
-                            else:
-                                return True
-
-                        if (game_board[0][0] == game_board[1][1]
-                                and game_board[1][1] == game_board[2][2]
-                                and game_board[0][0] != '-'):
-                            return True
-
-                        if (game_board[2][0] == game_board[1][1]
-                                and game_board[1][1] == game_board[0][2]
-                                and game_board[1][1] != '-'):
-                            return True
-
-                        return False
-
-                    if check_for_win():
-                        print(f'Player {players[turn-1]} wins the game!')
-                        history.append({'player1': players[0], 'player2': players[1],
-                                        'result': 'win', 'winner': players[turn-1]})
-                        break
-
-                    def check_for_draw():
-                        for i_ in range(3):
-                            for j_ in range(3):
-                                if game_board[i_][j_] == '-':
-                                    return False
-                        return True
-
-                    if check_for_draw():
-                        print('Draw!')
-                        history.append({'player1': players[0], 'player2': players[1], 'result': 'draw', 'winner': None})
-                        break
-
-                    turn = 1 if turn == 2 else 2
-                else:
-                    print('Error! You can not play at this position')
-            else:
-                print('Error! You must choose your number in [1,3]')
+    board = Board(player1, player2)
+    board.start_game()
 
 
 def main_menu():
