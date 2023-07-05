@@ -4,6 +4,7 @@ import random
 symbols = ['X', 'O']
 history = []
 
+
 class Player(object):
     all_players = []
 
@@ -26,12 +27,14 @@ def find_player(name):
         return None
     return player
 
+
 def add_player(name):
     if find_player(name) is None:
-        new_player = Player(name)
+        Player(name)
         print('Successfully add new player')
     else:
         print('Player with this name exist.\nFail to add new player')
+
 
 def remove_player(name):
     if find_player(name) is None:
@@ -41,19 +44,22 @@ def remove_player(name):
         player.remove()
         print('Successfully remove player')
 
+
 def show_players():
     for i, player in enumerate(Player.all_players):
         print(player.name)
 
+
 def modify_player(old_name, new_name):
     if find_player(old_name) is None:
         print('Player with this name does not exist.')
-    elif (find_player(new_name) is not None):
+    elif find_player(new_name) is not None:
         print('Player with this new name exist.')
     else:
         player = find_player(old_name)
         player.change_name(new_name)
         print('Successfully player name changed')
+
 
 def handle_players():
     while True:
@@ -82,37 +88,38 @@ def handle_players():
             case _:
                 print("Invalid command.")
 
+
 def start_new_game(player1, player2):
     global history
     players = [player1, player2]
-    turn = random.choice([1 , 2])
+    turn = random.choice([1, 2])
 
     def initial_game():
-        player_symbol = [None, None]
+        players_symbols = [None, None]
         if turn == 1:
             while True:
                 choice = input(f'Player {players[0]} choose his symbol: ')
                 if choice in ['X', 'O']:
-                    player_symbol[0] = choice
+                    players_symbols[0] = choice
                     break
                 else:
                     print('Please choose a valid symbol. (X or O)')
-            player_symbol[1] = 'O' if player_symbol[0] == 'X' else 'X'
+            players_symbols[1] = 'O' if players_symbols[0] == 'X' else 'X'
 
         else:
             while True:
                 choice = input(f'Player {players[1]} choose his symbol: ')
                 if choice in ['X', 'O']:
-                    player_symbol[1] = choice
+                    players_symbols[1] = choice
                     break
                 else:
                     print('Please choose a valid symbol. (X or O)')
-            player_symbol[0] = 'O' if player_symbol[1] == 'X' else 'X'
+            players_symbols[0] = 'O' if players_symbols[1] == 'X' else 'X'
 
-        return player_symbol
+        return players_symbols
 
     player_symbol = initial_game()
-    game_board = [['-', '-', '-'] for i in range(3)]
+    game_board = [['-', '-', '-'] for _ in range(3)]
     os.system('clear')
 
     while True:
@@ -130,25 +137,26 @@ def start_new_game(player1, player2):
             row, col = list(map(int, input('Please enter the position you want to play: ').split()))
         except Exception:
             os.system('clear')
-            print('Error! Please enter the position you want to play in a true format. (for example your input could be 1 3)')
+            print('Error! Please enter the position you want to play in a true format. '
+                  '(for example your input could be 1 3)')
         else:
             os.system('clear')
             if 0 < row < 4 and 0 < col < 4:
-                if (game_board[row - 1][col - 1] == '-'):
+                if game_board[row - 1][col - 1] == '-':
                     game_board[row - 1][col - 1] = player_symbol[turn - 1]
 
                     def check_for_win():
 
-                        for i in range(3):
-                            for j in range(2):
-                                if game_board[i][j] != game_board[i][j + 1] or game_board[i][j] == '-':
+                        for i_ in range(3):
+                            for j_ in range(2):
+                                if game_board[i_][j_] != game_board[i_][j_ + 1] or game_board[i_][j_] == '-':
                                     break
                             else:
                                 return True
 
-                        for j in range(3):
-                            for i in range(2):
-                                if game_board[i][j] != game_board[i + 1][j] or game_board[i][j] == '-':
+                        for j_ in range(3):
+                            for i_ in range(2):
+                                if game_board[i_][j_] != game_board[i_ + 1][j_] or game_board[i_][j_] == '-':
                                     break
                             else:
                                 return True
@@ -167,13 +175,14 @@ def start_new_game(player1, player2):
 
                     if check_for_win():
                         print(f'Player {players[turn-1]} wins the game!')
-                        history.append({'player1': players[0], 'player2': players[1], 'result': 'win', 'winner': players[turn-1]})
+                        history.append({'player1': players[0], 'player2': players[1],
+                                        'result': 'win', 'winner': players[turn-1]})
                         break
 
                     def check_for_draw():
-                        for i in range(3):
-                            for j in range(3):
-                                if game_board[i][j] == '-':
+                        for i_ in range(3):
+                            for j_ in range(3):
+                                if game_board[i_][j_] == '-':
                                     return False
                         return True
 
@@ -184,9 +193,10 @@ def start_new_game(player1, player2):
 
                     turn = 1 if turn == 2 else 2
                 else:
-                    print('Error! You can not play at this positon')
+                    print('Error! You can not play at this position')
             else:
                 print('Error! You must choose your number in [1,3]')
+
 
 def main_menu():
     while True:
@@ -211,7 +221,8 @@ def main_menu():
             case 'show history' | '3':
                 for i, game in enumerate(history):
                     if game['result'] == 'win':
-                        print(f"{i+1} : Game between {game['player1']} and {game['player2']} played and {game['winner']} wins the game.")
+                        print(f"{i+1} : Game between {game['player1']} and {game['player2']} played "
+                              f"and {game['winner']} wins the game.")
                     else:
                         print(f"{i+1} : Game between {game['player1']} and {game['player2']} played and no one wins.")
 
@@ -224,5 +235,6 @@ def main_menu():
                 break
             case _:
                 print("Invalid command.")
+
 
 main_menu()
