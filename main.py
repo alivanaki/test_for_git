@@ -2,6 +2,7 @@ import os
 import random
 
 symbols = ['X', 'O']
+history = []
 
 class Player(object):
     all_players = []
@@ -82,13 +83,15 @@ def handle_players():
                 print("Invalid command.")
 
 def start_new_game(player1, player2):
+    global history
+    players = [player1, player2]
     turn = random.choice([1 , 2])
 
     def initial_game():
         player_symbol = [None, None]
         if turn == 1:
             while True:
-                choice = input('Player 1 choose his symbol: ')
+                choice = input(f'Player {players[0]} choose his symbol: ')
                 if choice in ['X', 'O']:
                     player_symbol[0] = choice
                     break
@@ -98,7 +101,7 @@ def start_new_game(player1, player2):
 
         else:
             while True:
-                choice = input('Player 2 choose his symbol: ')
+                choice = input(f'Player {players[1]} choose his symbol: ')
                 if choice in ['X', 'O']:
                     player_symbol[1] = choice
                     break
@@ -114,9 +117,9 @@ def start_new_game(player1, player2):
 
     while True:
         if turn == 1:
-            print('Turn for player 1')
+            print(f'Turn for {players[0]}')
         else:
-            print('Turn for player 2')
+            print(f'Turn for {players[1]}')
 
         for i in range(3):
             for j in range(3):
@@ -133,7 +136,6 @@ def start_new_game(player1, player2):
             if 0 < row < 4 and 0 < col < 4:
                 if (game_board[row - 1][col - 1] == '-'):
                     game_board[row - 1][col - 1] = player_symbol[turn - 1]
-                    turn = 1 if turn == 2 else 2
 
                     def check_for_win():
 
@@ -164,7 +166,8 @@ def start_new_game(player1, player2):
                         return False
 
                     if check_for_win():
-                        print(f'Player {turn} wins the game!')
+                        print(f'Player {players[turn-1]} wins the game!')
+                        history.append({'player1': players[0], 'player2': players[1], 'result': 'win', 'winner': players[turn-1]})
                         break
 
                     def check_for_draw():
@@ -176,7 +179,10 @@ def start_new_game(player1, player2):
 
                     if check_for_draw():
                         print('Draw!')
+                        history.append({'player1': players[0], 'player2': players[1], 'result': 'draw', 'winner': None})
                         break
+
+                    turn = 1 if turn == 2 else 2
                 else:
                     print('Error! You can not play at this positon')
             else:
@@ -203,7 +209,12 @@ def main_menu():
                         start_new_game(player1, player2)
 
             case 'show history' | '3':
-                pass
+                for i, game in enumerate(history):
+                    if game['result'] == 'win':
+                        print(f"{i+1} : Game between {game['player1']} and {game['player2']} played and {game['winner']} wins the game.")
+                    else:
+                        print(f"{i+1} : Game between {game['player1']} and {game['player2']} played and no one wins.")
+
             case 'help':
                 print('1: manage players')
                 print('2: start new game')
