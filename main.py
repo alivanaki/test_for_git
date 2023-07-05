@@ -1,3 +1,7 @@
+import os
+
+symbols = ['X', 'O']
+
 class Player(object):
     all_players = []
 
@@ -10,6 +14,7 @@ class Player(object):
 
     def change_name(self, name):
         self.name = name
+
 
 def find_player(name):
     for player in Player.all_players:
@@ -51,6 +56,7 @@ def modify_player(old_name, new_name):
 def handle_players():
     while True:
         command = input("Please enter a valid command: ")
+        os.system('clear')
         match command:
             case 'add new player' | '1':
                 add_player(input('Please enter player name: '))
@@ -72,6 +78,5 @@ def handle_players():
                 break
             case _:
                 print("Invalid command.")
-
 
 handle_players()
