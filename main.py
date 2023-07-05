@@ -55,6 +55,7 @@ def modify_player(old_name, new_name):
 
 def handle_players():
     while True:
+        print('You are at manage players menu')
         command = input("Please enter a valid command: ")
         os.system('clear')
         match command:
@@ -79,4 +80,26 @@ def handle_players():
             case _:
                 print("Invalid command.")
 
-handle_players()
+def main_menu():
+    while True:
+        print('You are at main menu')
+        command = input("Please enter a valid command: ")
+        os.system('clear')
+        match command:
+            case 'manage players' | '1':
+                handle_players()
+            case 'start new game' | '2':
+                pass
+            case 'show history' | '3':
+                pass
+            case 'help':
+                print('1: manage players')
+                print('2: start new game')
+                print('3: show history')
+                print('0: quit')
+            case 'quit' | '0':
+                break
+            case _:
+                print("Invalid command.")
+
+main_menu()
